@@ -7,6 +7,30 @@ import { items as initialItems } from "./data/items";
 // 將初始的品項資料設定為響應式的 items，這樣 Vue 可以在資料變化時自動更新 UI
 const items = ref(initialItems);
 
+// 用於存儲當前正在編輯的品項的名稱
+const tempName = ref("");
+
+// 用於存儲當前正在編輯的品項 ID
+const editingItemId = ref(null);
+
+// 編輯品項名稱
+const editItemName = {
+  on(item) {
+    // 當雙擊品項名稱時，進入編輯模式
+    editingItemId.value = item.id;
+    tempName.value = item.name;
+  },
+  save(item) {
+    // 保存編輯後的名稱，並退出編輯模式
+    item.name = tempName.value;
+    editingItemId.value = null;
+  },
+  cancel() {
+    // 取消編輯，恢復原來的名稱
+    editingItemId.value = null;
+  },
+};
+
 // 定義一個函數 changeStockQty，用來改變品項的庫存數量
 // item: 代表要操作的品項
 // action: 代表操作的類型，'plus' 增加庫存，'minus' 減少庫存
@@ -44,8 +68,16 @@ const changeStockQty = (item, action) => {
       <!-- 使用 v-for 指令遍歷 items 數組，為每個品項生成一行 -->
       <tr v-for="item in items" :key="item.id">
         <td>
-          {{ item.name }}
-          <!-- 顯示品項名稱 -->
+          <template v-if="editingItemId === item.id">
+            <!-- 當前品項處於編輯模式時，顯示輸入框和控制按鈕 -->
+            <input v-model="tempName" type="text" />
+            <button class="btn" @click="editItemName.save(item)">儲存</button>
+            <button class="btn" @click="editItemName.cancel()">取消</button>
+          </template>
+          <template v-else>
+            <!-- 非編輯模式下顯示名稱，並監聽雙擊事件 -->
+            <span @dblclick="editItemName.on(item)">{{ item.name }}</span>
+          </template>
         </td>
         <td>
           <small>{{ item.description }}</small>
