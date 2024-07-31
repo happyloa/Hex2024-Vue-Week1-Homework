@@ -111,7 +111,7 @@ const changeStockQty = (item, action) => {
     </tbody>
   </table>
   <hr />
-  <p>💡對品項名稱點兩下即可編輯</p>
+  <p class="hint">💡對品項名稱點兩下即可編輯</p>
 </template>
 
 <style scoped>
